@@ -1,5 +1,26 @@
+# Project and Purpose
+
+The main purpose of this project is to provide a bot that a user can use to find flights
+and potentially make travel plans. Users should be able to provide the necessary 
+information in normal English, and the bot should make inferences of its own to find flight 
+info. This entails that the bot should somehow be able to understand text, and that the bot 
+should have access to flight data. For the latter, the we will access Google's QPX Express 
+API, which is a RESTful API that provides real time flight data. It's possible that for the
+understanding of text, NLP algorithms may be utilized.
+
 This "Serverless" Slack bot is built with nodejs and StdLib. Some of the functions
-and utilities were provided via StdLib.
+and utilities were provided via StdLib (through a `npm install lib.cli -g` on cmd line,
+followed by `$ mkdir stdlib`, `$ cd stdlib`, and `$ lib init`.
+
+# Current State [09/01/17]
+
+As of right now, the bot currently has a Slash command '/flight' which can understand
+"/flight from bos to lax on 08/31/17 for 1 adult " and return a JSON that looks like
+{"when" : "08/31/17","origin" : "BOS","destination" : "LAX","passengers" : "1 adult",}.
+This was achieved by simple string searching in JS and is very much hard coded to look for
+keywords like "from", "to", "on", "for", to understand origin, destination, date, and passenger
+info, respectively.
+
 
 # Functions
 
@@ -10,7 +31,7 @@ your StdLib function directory which maps directly to HTTP endpoints.
 
     -- main endpoint     
     -- can be reached via `https://ishnark.lib.id/slack-app@dev/main`     
-    -- provudes "Add to Slack" button, so app can be distributed
+    -- provides "Add to Slack" button, so app can be distributed
     
 - `auth.js`
 
