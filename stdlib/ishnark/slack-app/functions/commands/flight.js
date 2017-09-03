@@ -20,6 +20,7 @@ const lib = require('lib')({token: process.env.STDLIB_TOKEN});
 
 module.exports = (user, channel, text = '', command = {}, botToken = null, callback) => {
 	var resp = processText(text);
+	
   callback(null, {
     response_type: 'in_channel',
     text: `${resp}`
@@ -39,7 +40,7 @@ function processText(text) {
 									'"when" : "' + when + '",' +
 									'"origin" : "' + origin + '",' +
 									'"destination" : "' + destination + '",' +
-									'"passengers" : "' + passengers + '",' +
+									'"passengers" : "' + passengers + '"' +
 							'}';
 		} else {
 			return '';
