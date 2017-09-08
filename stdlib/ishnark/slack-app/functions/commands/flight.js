@@ -19,33 +19,69 @@ const lib = require('lib')({token: process.env.STDLIB_TOKEN});
 */
 
 module.exports = (user, channel, text = '', command = {}, botToken = null, callback) => {
-	var resp = processText(text);
-	
+	var resp = queryQpxApi(text, callback);
   callback(null, {
     response_type: 'in_channel',
-    text: `${resp}`
+    text: `${JSON.stringify(resp)}`
   });
 };
 
-function processText(text) {
+function queryQpxApi(text) {
 	if (text == undefined) {
 		return '';
 	} else {
 		if (typeof text === 'string' || text instanceof String) {
-			var when = find('on', text);
-			var origin = find('from', text);
-			var destination = find('to', text);
-			var passengers = find1('for', text);
-			return 	'{' +
-									'"when" : "' + when + '",' +
-									'"origin" : "' + origin + '",' +
-									'"destination" : "' + destination + '",' +
-									'"passengers" : "' + passengers + '"' +
-							'}';
+			return httpPOST(createRequestObject(text));	
 		} else {
 			return '';
 		}
 	}
+}
+
+function httpPOST(requestObject)
+{
+	/*var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;;
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.onreadystatechange = function() { 
+		if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+			if (!xmlHttp.responseType || xmlHttp.responseType == 'text') {
+				return xmlHttp.responseText;
+			} else if (xmlHttp.responseType == 'document') {
+				return xmlHttp.responseXML;
+			} else {
+				return xmlHttp.response;
+			}
+		}
+	}
+  xmlHttp.open("POST", "https://www.googleapis.com/qpxExpress/v1/trips/search?key=AIzaSyCl9j-z6n8xFBxlZ9e-mcGwXcKoZLzc9qw", true); // true for asynchronous 
+  xmlHttp.send(requestObject); */
+	return requestObject;
+}
+
+function createRequestObject(text) {
+	var request = 
+		{
+			request : {
+			slice : [],
+			passengers: {},
+			solutions : 20,
+			refundable : false
+		},
+	};
+	
+	var trip = {
+		origin : find('from', text),
+		destination : find('to', text),
+		date : find('on', text)
+	};
+	request.request.slice[0] = trip;
+	request.request.passengers.adultCount = findNumberPreceding('adult', text);
+	request.request.passengers.childCount = findNumberPreceding('child', text);
+	request.request.passengers.infantLapCount = findNumberPreceding('infant on lap', text) + findNumberPreceding('infants on lap', text);
+	request.request.passengers.infantSeatCount = findNumberPreceding('infant', text);
+	request.request.passengers.seniorCount = findNumberPreceding('senior', text);
+	
+	return request;
 }
 
 function find(what, text) {
@@ -53,18 +89,16 @@ function find(what, text) {
 		return '';
 	} else {
 		if (typeof what === 'string' || what instanceof String) {
-			for (var i = 0; i < text.length; i++) {
-				var ind = text.indexOf(what);
-				if (ind == -1) {
-					return '';
+			var ind = text.indexOf(what);
+			if (ind == -1) {
+				return '';
+			} else {
+				var restText = text.substring(ind + what.length + 1);
+				var spaceInd = restText.indexOf(' ');
+				if (spaceInd == -1) {
+					return restText;
 				} else {
-					var restText = text.substring(ind + what.length + 1);
-					var spaceInd = restText.indexOf(' ');
-					if (spaceInd == -1) {
-						return restText;
-					} else {
-						return restText.substring(0, spaceInd);
-					}
+					return restText.substring(0, spaceInd);
 				}
 			}
 		} else {
@@ -73,23 +107,28 @@ function find(what, text) {
 	}
 }
 
-function find1(what, text) {
-	if (what == undefined) {
-		return '';
+function findNumberPreceding(passengerType, text) {	
+	if (passengerType == undefined) {
+		return 0;
 	} else {
-		if (typeof what === 'string' || what instanceof String) {
-			for (var i = 0; i < text.length; i++) {
-				var ind = text.indexOf(what);
-				if (ind == -1) {
-					return '';
+		if (typeof passengerType === 'string' || passengerType instanceof String) {
+			var ind = text.indexOf(passengerType);
+			if (ind == -1) {
+				return 0;
+			} else {
+				var firstText = text.substring(0, ind);
+				var splitText = firstText.split(" ");
+				if (splitText.length == 0) {
+					return 0;
 				} else {
-					var restText = text.substring(ind + what.length + 1);
-					var spaceInd = restText.indexOf(' ');
-					return restText;
+					var num = splitText[splitText.length - 2];
+					return num;
 				}
 			}
-		} else {
-			return '';
 		}
 	}
+}
+
+function reverse(text) {
+	text.split("").reverse().join("");
 }
