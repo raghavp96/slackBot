@@ -121,7 +121,7 @@ function findNumberPreceding(passengerType, text) {
 				if (splitText.length == 0) {
 					return 0;
 				} else {
-					var num = splitText[splitText.length - 2];
+					var num = Number(splitText[splitText.length - 2]);
 					return num;
 				}
 			}
