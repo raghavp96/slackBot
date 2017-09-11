@@ -12,14 +12,39 @@ This "Serverless" Slack bot is built with nodejs and StdLib. Some of the functio
 and utilities were provided via StdLib (through a `npm install lib.cli -g` on cmd line,
 followed by `$ mkdir stdlib`, `$ cd stdlib`, and `$ lib init`.
 
-# Current State [09/01/17]
+# Current State [09/09/17]
 
 As of right now, the bot currently has a Slash command '/flight' which can understand
-"/flight from bos to lax on 08/31/17 for 1 adult " and return a JSON that looks like
-{"when" : "08/31/17","origin" : "BOS","destination" : "LAX","passengers" : "1 adult",}.
+"/flight from BOS to LAX on 2017-09-12 for 1 adult" and return a JSON that looks like
+the request JSON that will be understood by the QPX API (something like the following):
+
+{
+"request":
+    {
+        "slice":
+            \[
+                {
+                    "origin":"BOS",
+                    "destination":"LAX",
+                    "date":"2017-09-12"
+                }
+            ],
+        "passengers":      
+            {
+                "adultCount":"1",
+                "childCount":0,
+                "infantLapCount":0,
+                "infantSeatCount":0,
+                "seniorCount":0
+            },
+        "solutions":20,
+        "refundable":false
+    }
+}
+
 This was achieved by simple string searching in JS and is very much hard coded to look for
 keywords like "from", "to", "on", "for", to understand origin, destination, date, and passenger
-info, respectively.
+info, respectively. (Still facing some issues regarding making the actual POST request to the API)
 
 
 # Functions
