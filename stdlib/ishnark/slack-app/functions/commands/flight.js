@@ -22,7 +22,8 @@ module.exports = (user, channel, text = '', command = {}, botToken = null, callb
 	var resp = queryQpxApi(text, callback);
   callback(null, {
     response_type: 'in_channel',
-    text: `${JSON.stringify(resp)}`
+    //text: `${JSON.stringify(resp)}`
+    text: resp
   });
 };
 
@@ -40,22 +41,18 @@ function queryQpxApi(text) {
 
 function httpPOST(requestObject)
 {
-	/*var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;;
-  var xmlHttp = new XMLHttpRequest();
-  xmlHttp.onreadystatechange = function() { 
-		if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-			if (!xmlHttp.responseType || xmlHttp.responseType == 'text') {
-				return xmlHttp.responseText;
-			} else if (xmlHttp.responseType == 'document') {
-				return xmlHttp.responseXML;
+	var postRequest = require('request');
+	postRequest.post(
+		'https://www.googleapis.com/qpxExpress/v1/trips/search?key=AIzaSyDezFY0C4JTk_UvN4EbYdvrcsrivKbRZ3I',
+		requestObject,
+		function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+				return body;
 			} else {
-				return xmlHttp.response;
+				console.log('I MADE THIS LOG' + body);
 			}
 		}
-	}
-  xmlHttp.open("POST", "https://www.googleapis.com/qpxExpress/v1/trips/search?key=AIzaSyCl9j-z6n8xFBxlZ9e-mcGwXcKoZLzc9qw", true); // true for asynchronous 
-  xmlHttp.send(requestObject); */
-	return requestObject;
+	);
 }
 
 function createRequestObject(text) {
@@ -64,7 +61,7 @@ function createRequestObject(text) {
 			request : {
 			slice : [],
 			passengers: {},
-			solutions : 20,
+			solutions : 5,
 			refundable : false
 		},
 	};
