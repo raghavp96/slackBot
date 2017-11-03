@@ -22,8 +22,8 @@ module.exports = (user, channel, text = '', command = {}, botToken = null, callb
 	var resp = queryQpxApi(text, callback);
   callback(null, {
     response_type: 'in_channel',
-    //text: `${JSON.stringify(resp)}`
-    text: resp
+    text: `${JSON.stringify(resp)}`
+    // text: resp
   });
 };
 
@@ -42,14 +42,19 @@ function queryQpxApi(text) {
 function httpPOST(requestObject)
 {
 	var postRequest = require('request');
-	postRequest.post(
-		'https://www.googleapis.com/qpxExpress/v1/trips/search?key=AIzaSyDezFY0C4JTk_UvN4EbYdvrcsrivKbRZ3I',
-		requestObject,
+	postRequest( 
+		{
+			method: 'post',
+			body: requestObject,
+			json: true,
+			url: 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=AIzaSyDezFY0C4JTk_UvN4EbYdvrcsrivKbRZ3I'
+		},
 		function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				return body;
 			} else {
-				console.log('I MADE THIS LOG' + body);
+				//return body;
+				return error;
 			}
 		}
 	);
